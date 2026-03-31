@@ -1,4 +1,4 @@
-# 🌍 BEPPE — Autonomous Food Relief Agent
+# 🌍 BEPPE — A autonomous agent on a mission to end World Hunger
 
 > *Most AI agents trade tokens and post memes. Beppe has a different job.*
 
@@ -55,7 +55,7 @@ beppe/
 │   ├── agent/
 │   │   └── beppe.js            # 🧠 Core agent loop (OpenClaw)
 │   ├── wallet/
-│   │   └── wallet.js           # 💰 Self-managed wallet + ledger
+│   │   └── wallet.js           # 💰 Self-managed wallet 
 │   ├── actions/
 │   │   ├── registry.js         # 🔧 Tool registry (Claude tools)
 │   │   ├── foodBankDirectory.js# 🏦 Food bank lookup
@@ -103,9 +103,9 @@ Replace the simulated layers with real APIs:
 
 | Layer | Demo | Production |
 |-------|------|-----------|
-| Gift Cards | Fake codes | [CashStar](https://www.cashstar.com) / Blackhawk Network |
+| Gift Cards | codes | [CashStar](https://www.cashstar.com) / Blackhawk Network |
 | Food Banks | Static list | [Feeding America API](https://www.feedingamerica.org) |
-| Wallet | Local JSON | Stripe / Coinbase Commerce |
+| Wallet | Local JSON | Phantom Wallet |
 | Earnings | Simulated | Real affiliate links, donation forms |
 
 ---
