@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BEPPE — Mission Control</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0f0a;
+      --surface: #111711;
+      --surface2: #161e16;
+      --border: #1e2e1e;
+      --green: #4ade80;
+      --green-dim: #1a3a20;
+      --green-glow: rgba(74, 222, 128, 0.15);
+      --amber: #fbbf24;
+      --amber-dim: #3a2a05;
+      --text: #e8f5e9;
+      --muted: #4a6349;
+      --red: #f87171;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Noise texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image: 
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.4;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Header */
+    header {
+      position: relative;
+      z-index: 10;
+      padding: 24px 32px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(10, 15, 10, 0.8);
+      backdrop-filter: blur(10px);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--green);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      animation: pulse-glow 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px var(--green-glow); }
+      50% { box-shadow: 0 0 40px rgba(74, 222, 128, 0.4), 0 0 80px rgba(74, 222, 128, 0.1); }
+    }
+
+    .logo-text h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: var(--green);
+    }
+
+    .logo-text p {
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 100px;
+      border: 1px solid var(--green);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      background: var(--green-dim);
+      color: var(--green);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: blink 1.5s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+
+    /* Main layout */
+    main {
+      position: relative;
+      z-index: 10;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: auto;
+      gap: 20px;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      transition: border-color 0.2s;
+    }
+
+    .card:hover { border-color: var(--green); }
+
+    .card-label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .card-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--green);
+      line-height: 1;
+    }
+
+    .card-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* Mission ticker */
+    .mission-card {
+      grid-column: 1 / -1;
+      background: var(--green-dim);
+      border-color: var(--green);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 24px;
+    }
+
+    .mission-badge {
+      font-family: 'Syne', sans-serif;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      color: var(--green);
+      background: rgba(74,222,128,0.15);
+      padding: 4px 10px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .mission-text {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+
+    /* Activity feed */
+    .feed-card {
+      grid-column: 1 / 3;
+      grid-row: span 2;
+    }
+
+    .feed-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .feed-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.05em;
+    }
+
+    .run-btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      padding: 8px 16px;
+      background: var(--green);
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+      transition: all 0.2s;
+    }
+
+    .run-btn:hover { background: #6ee7a0; transform: translateY(-1px); }
+    .run-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .feed {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    .feed::-webkit-scrollbar { width: 4px; }
+    .feed::-webkit-scrollbar-track { background: var(--surface2); }
+    .feed::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .feed-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      animation: slideIn 0.4s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .feed-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .feed-body { flex: 1; min-width: 0; }
+
+    .feed-event {
+      font-size: 12px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .feed-time {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .feed-amount {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--green);
+      white-space: nowrap;
+    }
+
+    /* Donations log */
+    .donations-card {
+      grid-column: 3;
+      grid-row: 2 / 5;
+    }
+
+    .donation-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .donation-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .donation-bank {
+      font-family: 'Syne', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .donation-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .donation-amount { color: var(--green); font-weight: 700; }
+
+    /* Progress bar */
+    .progress-card { grid-column: 1 / 3; }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 12px;
+    }
+
+    .progress-track {
+      height: 6px;
+      background: var(--surface2);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--green), #6ee7a0);
+      border-radius: 3px;
+      transition: width 1s ease-out;
+    }
+
+    /* Wallet vis */
+    .wallet-detail {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .wallet-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      padding: 8px 12px;
+      background: var(--surface2);
+      border-radius: 6px;
+    }
+
+    .wallet-row span:first-child { color: var(--muted); }
+    .wallet-row span:last-child { color: var(--text); }
+
+    /* Thinking state */
+    .thinking {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--amber);
+      padding: 10px 16px;
+      background: var(--amber-dim);
+      border: 1px solid var(--amber);
+      border-radius: 8px;
+      margin-top: 12px;
+    }
+
+    .thinking.active { display: flex; }
+
+    .thinking-dots span {
+      animation: dot 1.4s infinite;
+      display: inline-block;
+    }
+    .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes dot {
+      0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+      40% { opacity: 1; transform: scale(1); }
+    }
+
+    /* Meals counter — big hero */
+    .meals-hero {
+      grid-column: 1 / 3;
+      background: linear-gradient(135deg, var(--green-dim), var(--surface));
+      border-color: var(--green);
+      text-align: center;
+      padding: 32px;
+    }
+
+    .meals-number {
+      font-family: 'Syne', sans-serif;
+      font-size: 72px;
+      font-weight: 800;
+      color: var(--green);
+      line-height: 1;
+      text-shadow: 0 0 60px rgba(74,222,128,0.4);
+      transition: all 0.5s;
+    }
+
+    .meals-label {
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    /* Empty state */
+    .empty {
+      text-align: center;
+      padding: 32px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      main { grid-template-columns: 1fr 1fr; }
+      .feed-card { grid-column: 1 / -1; }
+      .donations-card { grid-column: 1 / -1; grid-row: auto; }
+      .meals-hero { grid-column: 1 / -1; }
+      .progress-card { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 640px) {
+      main { grid-template-columns: 1fr; padding: 16px; gap: 12px; }
+      header { padding: 16px; }
+      .meals-number { font-size: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🌍</div>
+      <div class="logo-text">
+        <h1>BEPPE</h1>
+        <p>Autonomous Food Relief Agent</p>
+      </div>
+    </div>
+    <div class="status-pill">
+      <div class="status-dot"></div>
+      <span>AGENT ONLINE</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- Mission banner -->
+    <div class="card mission-card">
+      <div class="mission-badge">MISSION</div>
+      <div class="mission-text">
+        Beppe earns money → buys grocery gift cards → donates them to food banks. No humans required. 
+        Every dollar is tracked. Every meal counts.
+      </div>
+    </div>
+
+    <!-- Meals hero -->
+    <div class="card meals-hero">
+      <div class="meals-number" id="meals-count">0</div>
+      <div class="meals-label">Estimated Meals Funded</div>
+    </div>
+
+    <!-- Wallet card -->
+    <div class="card">
+      <div class="card-label">Wallet Balance</div>
+      <div class="card-value" id="balance">$0.00</div>
+      <div class="card-sub" id="spending-limit">Spending limit loading...</div>
+      <div class="wallet-detail">
+        <div class="wallet-row">
+          <span>Total Earned</span>
+          <span id="total-earned">—</span>
+        </div>
+        <div class="wallet-row">
+          <span>Total Donated</span>
+          <span id="total-donated">—</span>
+        </div>
+        <div class="wallet-row">
+          <span>Cycles Run</span>
+          <span id="cycle-count">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activity feed -->
+    <div class="card feed-card">
+      <div class="feed-header">
+        <div class="feed-title">Activity Feed</div>
+        <button class="run-btn" id="run-btn" onclick="runCycle()">▶ Run Cycle</button>
+      </div>
+      <div class="thinking" id="thinking">
+        <span>🧠 Beppe is thinking</span>
+        <div class="thinking-dots">
+          <span>●</span><span>●</span><span>●</span>
+        </div>
+      </div>
+      <div class="feed" id="feed">
+        <div class="empty">No activity yet. Run a cycle to watch Beppe work.</div>
+      </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="card progress-card">
+      <div class="progress-label">
+        <span style="font-size:11px;color:var(--muted);letter-spacing:0.1em">MISSION PROGRESS</span>
+        <span style="font-size:11px;color:var(--green)" id="progress-pct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+      <div style="font-size:10px;color:var(--muted);margin-top:8px">Goal: 10,000 meals funded</div>
+    </div>
+
+    <!-- Donations log -->
+    <div class="card donations-card">
+      <div class="feed-title" style="margin-bottom:16px">Food Banks Helped</div>
+      <div class="donation-list" id="donation-list">
+        <div class="empty">No donations yet.</div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="card">
+      <div class="card-label">Food Banks Helped</div>
+      <div class="card-value" id="banks-count">0</div>
+      <div class="card-sub">Unique organizations</div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Total Donations</div>
+      <div class="card-value" id="donation-count">0</div>
+      <div class="card-sub">Gift cards delivered</div>
+    </div>
+  </main>
+
+  <script>
+    const MEAL_GOAL = 10000;
+
+    async function fetchStatus() {
+      try {
+        const [status, wallet, donations] = await Promise.all([
+          fetch('/api/status').then(r => r.json()),
+          fetch('/api/wallet').then(r => r.json()),
+          fetch('/api/donations').then(r => r.json()),
+        ]);
+
+        // Update wallet
+        document.getElementById('balance').textContent = '$' + wallet.balance.toFixed(2);
+        document.getElementById('spending-limit').textContent = `Max this cycle: $${wallet.spendingLimit.toFixed(2)}`;
+        document.getElementById('total-earned').textContent = '$' + wallet.totalEarned.toFixed(2);
+        document.getElementById('total-donated').textContent = '$' + wallet.totalDonated.toFixed(2);
+        document.getElementById('cycle-count').textContent = status.cycleCount || 0;
+
+        // Meals
+        const meals = donations.reduce((s, d) => s + (d.estimatedMeals || 0), 0);
+        animateNumber('meals-count', meals);
+
+        // Progress
+        const pct = Math.min(100, Math.round((meals / MEAL_GOAL) * 100));
+        document.getElementById('progress-pct').textContent = pct + '%';
+        document.getElementById('progress-fill').style.width = pct + '%';
+
+        // Donations list
+        const banks = new Set(donations.map(d => d.foodBankId)).size;
+        document.getElementById('banks-count').textContent = banks;
+        document.getElementById('donation-count').textContent = donations.length;
+
+        if (donations.length > 0) {
+          const list = document.getElementById('donation-list');
+          list.innerHTML = '';
+          [...donations].reverse().slice(0, 15).forEach(d => {
+            const item = document.createElement('div');
+            item.className = 'donation-item';
+            item.innerHTML = `
+              <div class="donation-bank">${d.foodBankName}</div>
+              <div class="donation-meta">
+                <span>${d.foodBankCity} · ${d.retailer}</span>
+                <span class="donation-amount">$${d.amount}</span>
+              </div>
+              <div class="donation-meta" style="margin-top:4px">
+                <span>~${d.estimatedMeals} meals</span>
+                <span>${new Date(d.deliveredAt).toLocaleDateString()}</span>
+              </div>
+            `;
+            list.appendChild(item);
+          });
+        }
+
+        // Wallet history feed
+        if (wallet.history && wallet.history.length > 0) {
+          const feed = document.getElementById('feed');
+          if (feed.querySelector('.empty')) feed.innerHTML = '';
+          wallet.history.slice(0, 10).forEach(tx => {
+            if (!document.getElementById(`tx-${tx.id}`)) {
+              const icon = tx.type === 'credit' ? '💰' : tx.description.includes('Gift') ? '🎁' : '📤';
+              const item = document.createElement('div');
+              item.className = 'feed-item';
+              item.id = `tx-${tx.id}`;
+              item.innerHTML = `
+                <div class="feed-icon">${icon}</div>
+                <div class="feed-body">
+                  <div class="feed-event">${tx.description}</div>
+                  <div class="feed-time">${new Date(tx.timestamp).toLocaleTimeString()}</div>
+                </div>
+                <div class="feed-amount ${tx.type === 'debit' ? 'style="color:var(--red)"' : ''}">
+                  ${tx.type === 'credit' ? '+' : '-'}$${tx.amount.toFixed(2)}
+                </div>
+              `;
+              feed.prepend(item);
+            }
+          });
+        }
+      } catch (e) {
+        console.warn('Could not fetch status', e);
+      }
+    }
+
+    async function runCycle() {
+      const btn = document.getElementById('run-btn');
+      const thinking = document.getElementById('thinking');
+      btn.disabled = true;
+      thinking.classList.add('active');
+
+      try {
+        const res = await fetch('/api/run-cycle', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+        const data = await res.json();
+        if (data.success) {
+          addFeedItem('🌍', 'Beppe completed a cycle', data.result?.slice(0, 120) + '...');
+          await fetchStatus();
+        }
+      } catch (e) {
+        addFeedItem('⚠️', 'Error running cycle', e.message);
+      } finally {
+        btn.disabled = false;
+        thinking.classList.remove('active');
+      }
+    }
+
+    function addFeedItem(icon, title, body) {
+      const feed = document.getElementById('feed');
+      if (feed.querySelector('.empty')) feed.innerHTML = '';
+      const item = document.createElement('div');
+      item.className = 'feed-item';
+      item.innerHTML = `
+        <div class="feed-icon">${icon}</div>
+        <div class="feed-body">
+          <div class="feed-event"><strong>${title}</strong><br>${body}</div>
+          <div class="feed-time">${new Date().toLocaleTimeString()}</div>
+        </div>
+      `;
+      feed.prepend(item);
+    }
+
+    function animateNumber(id, target) {
+      const el = document.getElementById(id);
+      const current = parseInt(el.textContent.replace(/,/g, '')) || 0;
+      if (current === target) return;
+      const step = Math.ceil(Math.abs(target - current) / 30);
+      let val = current;
+      const interval = setInterval(() => {
+        val = val < target ? Math.min(val + step, target) : Math.max(val - step, target);
+        el.textContent = val.toLocaleString();
+        if (val === target) clearInterval(interval);
+      }, 30);
+    }
+
+    // Poll for updates
+    fetchStatus();
+    setInterval(fetchStatus, 10000);
+  </script>
+</body>
+</html>

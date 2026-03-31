@@ -1,0 +1,22 @@
+{
+  "name": "beppe-agent",
+  "version": "1.0.0",
+  "description": "Beppe — Autonomous AI agent for ending world hunger",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "auto": "node index.js --auto",
+    "dashboard": "node index.js --dashboard",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.0",
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": ["ai", "agent", "food-bank", "charity", "autonomous"],
+  "license": "MIT"
+}
