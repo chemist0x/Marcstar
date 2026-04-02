@@ -1,135 +1,108 @@
-# 🌍 BEPPE — A autonomous agent on a mission to end World Hunger
+MarcStar
 
-> *Most AI agents trade tokens and post memes. Beppe has a different job.*
+An autonomous agent inspired by Marc Andreessen, powered by Clawd.
 
-Beppe is a fully autonomous AI agent powered by Claude (OpenClaw) whose sole purpose is to help end world hunger. It earns money, buys grocery gift cards, and donates them to food banks — no humans required.
+MarcStar is a self-operating AI agent designed to think, post, and evolve independently. It runs its own X (Twitter) account, makes its own decisions, and operates continuously across simulated environments.
 
----
+✨ Overview
 
-## What Beppe Does
+MarcStar represents a new class of agents:
 
-```
-earn funds → check food bank needs → buy gift cards → donate → repeat
-```
+Autonomous decision-making
+Persistent online presence
+Self-directed content generation
+Continuous learning loops
+Multi-environment simulation execution
 
-Every cycle, Beppe:
-1. **Checks its wallet** — balance, spending limits, reserves
-2. **Finds food banks** in highest-need areas via directory lookup
-3. **Purchases digital gift cards** from grocery retailers (Walmart, Kroger, Safeway, etc.)
-4. **Donates them** to verified food banks
-5. **Logs everything** with full transparency
+It is built to explore the idea of scientific abundance — a future where intelligent agents accelerate progress beyond human limitations.
 
----
+🧠 Core Concept
 
-## Quick Start
+"Legions operating 24/7 across vast virtual simulators."
 
-```bash
-# 1. Clone and install
-git clone https://github.com/yourname/beppe
-cd beppe
+MarcStar is not just a bot — it is an evolving system:
+
+Observes
+Analyzes
+Acts
+Iterates
+
+All without human intervention.
+
+⚙️ Features
+🧠 Autonomous Agent Logic – Makes independent decisions
+🐦 X Integration – Runs and manages its own account
+🔁 Continuous Operation – 24/7 runtime
+🌐 Simulation Environments – Tests strategies across virtual spaces
+📊 Adaptive Behavior – Learns and evolves over time
+🏗️ Architecture (High-Level)
+User Input / Environment Signals
+            ↓
+      Decision Engine (Clawd)
+            ↓
+   Action Layer (Post / Interact)
+            ↓
+     Feedback + Memory Loop
+            ↓
+      Continuous Optimization
+🚀 Vision
+
+The age of scientific abundance is inevitable.
+
+MarcStar is an early step toward a world where:
+
+Agents create value autonomously
+Intelligence scales infinitely
+Innovation is continuous and exponential
+📦 Use Cases
+Autonomous social media agents
+AI-native trading or strategy systems
+Simulation-based research agents
+Meme / culture propagation engines
+🛠️ Getting Started
+git clone https://github.com/yourusername/marcstar.git
+cd marcstar
+
+
+# install dependencies
 npm install
 
-# 2. Set your API key
-cp .env.example .env
-# Edit .env and add your ANTHROPIC_API_KEY
 
-# 3. Run a single cycle
+# run agent
 npm start
+⚠️ Disclaimer
 
-# 4. Run autonomously (every 60 minutes)
-npm run auto
+MarcStar is an experimental autonomous system.
 
-# 5. Launch the mission control dashboard
-npm run dashboard
-# → Open http://localhost:3000
-```
+It may produce unpredictable outputs and should be used responsibly.
 
----
+🧬 Philosophy
 
-## Architecture
+We are entering a phase where:
 
-```
-beppe/
-├── index.js                    # Entry point / CLI
-├── src/
-│   ├── agent/
-│   │   └── beppe.js            # 🧠 Core agent loop (OpenClaw)
-│   ├── wallet/
-│   │   └── wallet.js           # 💰 Self-managed wallet 
-│   ├── actions/
-│   │   ├── registry.js         # 🔧 Tool registry (Claude tools)
-│   │   ├── foodBankDirectory.js# 🏦 Food bank lookup
-│   │   └── giftCardPurchaser.js# 🎁 Gift card API
-│   ├── ui/
-│   │   ├── server.js           # 🌐 Dashboard API
-│   │   └── public/index.html   # 📊 Mission control UI
-│   └── utils/
-│       ├── logger.js           # Console logging
-│       └── missionLog.js       # Persistent cycle log
-└── data/                       # Auto-created: ledger, donations, logs
-```
+Agents think faster than humans
+Systems evolve without oversight
+Creation becomes continuous
 
----
+MarcStar exists at that edge.
 
-## Under the Hood
+📜 License
 
-### OpenClaw (Claude Agentic Loop)
-Beppe uses Claude's tool-use API in a loop:
-- Claude decides what to do next
-- Calls tools (check_wallet, find_food_banks, purchase_gift_card, donate_gift_card)
-- Receives results, reasons about them, acts again
-- Stops when the cycle is complete
+MIT
 
-### Self-Managed Wallet
-- Local JSON ledger tracks every transaction
-- Built-in spending rules: max 40% per cycle, 10% reserve always maintained
-- All credits and debits are timestamped and permanent
+🧪 Status
 
-### Tools Available to Beppe
-| Tool | What it does |
-|------|-------------|
-| `check_wallet` | Balance, limits, recent transactions |
-| `find_food_banks` | Search by region, sorted by need score |
-| `purchase_gift_card` | Buy from Walmart, Kroger, Safeway, etc. |
-| `donate_gift_card` | Send code to food bank |
-| `get_mission_stats` | Total meals, banks helped, donations |
-| `simulate_earnings` | Earn via affiliate/grants/donations |
+Active Development
 
----
+Building toward fully autonomous, self-improving agents.
 
-## Production Integrations
+Your README is ready in the canvas — clean, structured, and easy to copy-paste.
 
-Replace the simulated layers with real APIs:
+If you want, I can level it up with:
 
-| Layer | Demo | Production |
-|-------|------|-----------|
-| Gift Cards | codes | [CashStar](https://www.cashstar.com) / Blackhawk Network |
-| Food Banks | Static list | [Feeding America API](https://www.feedingamerica.org) |
-| Wallet | Local JSON | Phantom Wallet |
-| Earnings | Simulated | Real affiliate links, donation forms |
+a more “viral / memetic” tone
+badges (build, license, socials)
+token / agent economy section
+or a sharper Andreessen-style philosophy section
 
----
-
-## Mission Control Dashboard
-
-Run `npm run dashboard` to open the live UI:
-- 📊 Real-time wallet balance
-- 🍽️ Animated meals counter
-- 📋 Full transaction feed
-- 🏦 Food banks helped
-- ▶ Manual cycle trigger
-
----
-
-## Requirements
-- Node.js 18+
-- Anthropic API key (`ANTHROPIC_API_KEY`)
-
----
-
-## License
-MIT — Fork it, deploy it, feed people.
-
----
-
-*"Every meal matters."* — Beppe
+Just tell me the vibe you want.
